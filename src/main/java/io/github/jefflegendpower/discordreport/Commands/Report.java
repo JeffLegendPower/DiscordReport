@@ -1,7 +1,9 @@
 package io.github.jefflegendpower.discordreport.Commands;
 
+import io.github.jefflegendpower.discordreport.Files.CustomConfig;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.TextChannel;
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,7 +18,8 @@ public class Report implements CommandExecutor {
 
     public Report(JDA bot) {
         this.bot = bot;
-        this.textChannel = bot.getTextChannelById(844737301238120452L);
+        this.textChannel = bot.getTextChannelById(CustomConfig.getConfig().getLong("Textchannel ID"));
+//        this.textChannel = bot.getTextChannelById(844737301238120452L);
     }
 
     @Override
@@ -24,19 +27,19 @@ public class Report implements CommandExecutor {
         if (command.getName().equalsIgnoreCase("report") && sender instanceof Player player) {
             if (!(player.hasPermission("reporttodiscord.report") || player.hasPermission("*") || player.isOp())) {
                 player.sendMessage(ChatColor.RED + "You do not have permission to execute that command");
-                return false;
+                return true;
             }
             if (args.length == 0) {
                 player.sendMessage(ChatColor.RED + "Who are you reporting?");
                 return true;
             }
             else if (args.length >= 2) {
-                StringBuffer stringBuffer = new StringBuffer();
-                for (int i = 1; i < args.length; i++) {
-                    stringBuffer.append(args[i]);
-                    textChannel.sendMessage(player.getName() + " has reported " + args[0] + " for " + stringBuffer.toString()).queue();
-                    return true;
-                }
+                String[] reportReason = (String[]) ArrayUtils.remove(args, 0);
+                String report = String.join(" ", reportReason);
+
+                textChannel.sendMessage(player.getName() + " has reported " +
+                        args[0] + " for " + report).queue();
+                return true;
             }
             else {
                 textChannel.sendMessage(player.getName() + " has reported " + args[0]).queue();
