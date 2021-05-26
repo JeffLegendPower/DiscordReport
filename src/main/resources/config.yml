@@ -1,2 +1,7 @@
 Bot token: 'none'
 Textchannel ID: 'none'
+
+# The allowed colors are:
+# RED , GREEN , BLUE , MAGENTA , CYAN , YELLOW , BLACK , WHITE , GRAY , DARK_GRAY , LIGHT_GRAY , ORANGE , PINK
+Embed color: 'GRAY'
+Activity: 'Watching your every move...'

@@ -1,7 +1,7 @@
 package io.github.jefflegendpower.discordreport;
 
+import io.github.jefflegendpower.discordreport.Commands.Reload;
 import io.github.jefflegendpower.discordreport.Commands.Report;
-import io.github.jefflegendpower.discordreport.Files.CustomConfig;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -13,39 +13,57 @@ import java.util.logging.Logger;
 
 public final class DiscordReport extends JavaPlugin{
 
+    private JDA bot = null;
     public static Logger log = Bukkit.getLogger();
+    private Report report;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
+        this.saveDefaultConfig();
 
-        // Config setup
-        getConfig().options().copyDefaults();
-        saveDefaultConfig();
-
-        CustomConfig.setUp();
-        CustomConfig.getConfig().options().copyDefaults(true);
-
-        JDABuilder jdaBuilder = JDABuilder.createDefault(CustomConfig.getConfig().getString("Bot token"));
-//        JDABuilder jdaBuilder = JDABuilder.createDefault("ODE4MzA0Njg0Mjc1MDA3NDkw.YEWHoA.1Fg9IzG-C2VEPXS1oikO1n3J-es");
-        jdaBuilder.setActivity(Activity.playing("testo testo"));
-        JDA bot = null;
+        JDABuilder jdaBuilder = JDABuilder.createDefault(this.getConfig().getString("Bot token"));
+        jdaBuilder.setActivity(Activity.playing(this.getConfig().getString("Activity") + "reloaded"));
         try {
             bot = jdaBuilder.build();
             bot.awaitReady();
         } catch (LoginException | InterruptedException e) {
             e.printStackTrace();
         }
+
+        report = new Report(bot);
+        Reload reload = new Reload(this, bot);
+
+        this.getCommand("report").setExecutor(report);
+        this.getCommand("reload-discordreport").setExecutor(reload);
+
         System.out.println("Bot booted");
 
-        Report report = new Report(bot);
-        this.getCommand("report").setExecutor(report);
 
-        CustomConfig.save();
+        this.saveConfig();
     }
 
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+    }
+
+    public void updateBot() {
+        JDABuilder jdaBuilder = null;
+        try {
+            jdaBuilder = JDABuilder.createDefault(this.getConfig().getString("Bot token"));
+        } catch (NullPointerException e) {
+            System.out.println("Invalid bot token! Disabling report...");
+            report.setDisabled(true);
+        }
+        jdaBuilder.setActivity(Activity.playing(this.getConfig().getString("Activity")));
+
+        try {
+            bot = jdaBuilder.build();
+            bot.awaitReady();
+        } catch (LoginException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        report.updateBot(bot);
     }
 }

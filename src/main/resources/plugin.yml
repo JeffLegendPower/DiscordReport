@@ -2,9 +2,18 @@ name: DiscordReport
 version: ${project.version}
 main: io.github.jefflegendpower.discordreport.DiscordReport
 api-version: 1.16
+load: POSTWORLD
 authors: [ JeffLegendPower ]
+depend:
+  - JDA
 commands:
+  discordreport:
+    description: All subcommands go here
+    usage: /<command> [reload]
   report:
     description: Reports players to discord
     usage: /report
+  reload-discordreport:
+    description: reloads
+    usage: /reload-discordreport
 

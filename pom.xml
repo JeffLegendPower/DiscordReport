@@ -6,7 +6,7 @@
 
     <groupId>io.github.jefflegendpower</groupId>
     <artifactId>DiscordReport</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>jar</packaging>
 
     <name>DiscordReport</name>
@@ -38,9 +38,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${dir}</outputDirectory>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
                         </configuration>
                     </execution>
                 </executions>
@@ -81,6 +79,7 @@
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
             <version>4.2.1_265</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
