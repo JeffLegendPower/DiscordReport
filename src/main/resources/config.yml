@@ -1,7 +1,15 @@
+# Go to https://www.writebots.com/discord-bot-token/ to find a tutorial on how to get your bot token
+# For bot permissions you need 'Send Messages' and 'View Channels'
+# If you don't know how to get the ID of the text channel you want to send the messages in, go to
+# https://www.youtube.com/watch?v=NLWtSHWKbAI
+# The allowed embed colors are:
+# RED , GREEN , BLUE , MAGENTA , CYAN , YELLOW , BLACK
+# WHITE , GRAY , DARK_GRAY , LIGHT_GRAY , ORANGE , PINK
+
 Bot token: 'none'
+
 Textchannel ID: 'none'
 
-# The allowed colors are:
-# RED , GREEN , BLUE , MAGENTA , CYAN , YELLOW , BLACK , WHITE , GRAY , DARK_GRAY , LIGHT_GRAY , ORANGE , PINK
 Embed color: 'GRAY'
+
 Activity: 'Watching your every move...'

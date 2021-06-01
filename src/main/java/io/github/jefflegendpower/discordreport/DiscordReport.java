@@ -11,34 +11,33 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.security.auth.login.LoginException;
 import java.util.logging.Logger;
 
-public final class DiscordReport extends JavaPlugin{
+public final class DiscordReport extends JavaPlugin {
 
     private JDA bot = null;
-    public static Logger log = Bukkit.getLogger();
     private Report report;
+    public static Logger log = Bukkit.getLogger();
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
-        this.saveDefaultConfig();
 
-        JDABuilder jdaBuilder = JDABuilder.createDefault(this.getConfig().getString("Bot token"));
-        jdaBuilder.setActivity(Activity.playing(this.getConfig().getString("Activity") + "reloaded"));
-        try {
-            bot = jdaBuilder.build();
-            bot.awaitReady();
-        } catch (LoginException | InterruptedException e) {
-            e.printStackTrace();
+        if (getServer().getPluginManager().getPlugin("JDA") == null) {
+            log.warning("[DiscordReport] " + "JDA not found! Disabling plugin...");
+            this.getServer().getPluginManager().disablePlugin(this);
         }
 
+        // Plugin startup logic
+        this.saveDefaultConfig();
+        this.getConfig().options().copyDefaults(true);
+
+        buildJDA();
+
         report = new Report(bot);
-        Reload reload = new Reload(this, bot);
+        Reload reload = new Reload();
 
         this.getCommand("report").setExecutor(report);
-        this.getCommand("reload-discordreport").setExecutor(reload);
+        this.getCommand("discordreport").setExecutor(reload);
 
         System.out.println("Bot booted");
-
 
         this.saveConfig();
     }
@@ -46,24 +45,25 @@ public final class DiscordReport extends JavaPlugin{
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        if (bot != null)
+            bot.shutdown();
     }
 
-    public void updateBot() {
-        JDABuilder jdaBuilder = null;
+    public void buildJDA() {
         try {
-            jdaBuilder = JDABuilder.createDefault(this.getConfig().getString("Bot token"));
-        } catch (NullPointerException e) {
-            System.out.println("Invalid bot token! Disabling report...");
-            report.setDisabled(true);
-        }
-        jdaBuilder.setActivity(Activity.playing(this.getConfig().getString("Activity")));
+            JDABuilder jdaBuilder = JDABuilder.createDefault(this.getConfig().getString("Bot token"));
+            jdaBuilder.setActivity(Activity.playing(this.getConfig().getString("Activity") + ""));
 
-        try {
             bot = jdaBuilder.build();
             bot.awaitReady();
-        } catch (LoginException | InterruptedException e) {
+            report.updateBot(bot);
+        } catch (InterruptedException e) {
+            log.warning("");
             e.printStackTrace();
+            Report.setDisabled(true);
+        } catch (LoginException | NullPointerException e) {
+            log.warning("[DiscordReport] " + "Invalid bot token! Disabling report command...");
+            Report.setDisabled(true);
         }
-        report.updateBot(bot);
     }
 }

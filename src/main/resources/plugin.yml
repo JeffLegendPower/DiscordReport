@@ -9,7 +9,7 @@ depend:
 commands:
   discordreport:
     description: All subcommands go here
-    usage: /<command> [reload]
+    usage: /discordreport [reload]
   report:
     description: Reports players to discord
     usage: /report

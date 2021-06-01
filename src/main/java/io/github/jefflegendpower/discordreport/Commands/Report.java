@@ -17,20 +17,20 @@ import java.awt.*;
 public class Report implements CommandExecutor {
 
     private boolean disabled = false;
-    private JDA bot;
+
     private TextChannel textChannel;
     private Color color;
     private final DiscordReport plugin = DiscordReport.getPlugin(DiscordReport.class);
 
     public Report(JDA bot) {
+
         try {
             this.textChannel = bot.getTextChannelById(plugin.getConfig().getLong("Textchannel ID"));
-            this.bot = bot;
         }
         catch (NullPointerException e) {
-            DiscordReport.log.warning("You have put an invalid channel id! Disabling plugin...");
+            DiscordReport.log.warning("You have put an invalid channel id! Disabling report command...");
+            disabled = true;
         }
-
 
         try {
             color = (Color) Color.class.getField(plugin.getConfig().getString("Embed color")).get(null);
@@ -42,11 +42,19 @@ public class Report implements CommandExecutor {
         }
     }
 
+    private Report() {
+    }
+
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (command.getName().equalsIgnoreCase("report") && sender instanceof Player player) {
+            if (disabled) {
+                sender.sendMessage(ChatColor.AQUA + "[DiscordReport] " + ChatColor.RED + "This command has been disabled due to an invalid config");
+                return true;
+            }
+
             if (!(player.hasPermission("discordreport.report") || player.hasPermission("*") || player.isOp())) {
-                player.sendMessage(ChatColor.RED + "You do not have permission to execute that command");
+                player.sendMessage(ChatColor.AQUA + "[DiscordReport]" + ChatColor.RED + "You do not have permission to execute that command");
                 return true;
             }
 
@@ -61,12 +69,7 @@ public class Report implements CommandExecutor {
             }
             return true;
         }
-        else if(disabled)
-            sender.sendMessage(ChatColor.RED + "This command has been disabled. Please contact a server administrator if you see this problem");
 
-        else {
-            DiscordReport.log.info("Only players can report!");
-        }
         return false;
     }
 
@@ -80,7 +83,7 @@ public class Report implements CommandExecutor {
         String[] reportReason = (String[]) ArrayUtils.remove(args, 0);
         String report = String.join(" ", reportReason);
 
-        builder.setTitle(player.getName() + " has reported " + args[0] + " for:");
+        builder.setTitle(player.getName() + " has reported " + args[0] + " for");
         builder.setDescription(report);
         textChannel.sendMessage(builder.build()).queue();
 
@@ -88,22 +91,32 @@ public class Report implements CommandExecutor {
     }
 
     public void updateBot(JDA bot) {
-        try {
-            this.bot = bot;
-        } catch (NullPointerException e) {
-            DiscordReport.log.warning("You have put an invalid bot id! Disabling command...");
-            disabled = true;
-        }
+        this.disabled = false;
+
         try {
             this.textChannel = bot.getTextChannelById(plugin.getConfig().
                     getLong("Textchannel ID"));
+
+            if (!textChannel.canTalk())
+                throw new NullPointerException();
         } catch (NullPointerException e) {
-            DiscordReport.log.warning("You have put an invalid channel id! Disabling command...");
+            DiscordReport.log.warning("[DiscordReport] " + "You have put an invalid channel id! Disabling report command...");
             disabled = true;
+        }
+
+        try {
+            color = (Color) Color.class.getField(plugin.getConfig().getString("Embed color")).get(null);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException | NullPointerException e) {
+            DiscordReport.log.warning("[DiscordReport] " + "You have put an invalid color in the config! Defaulting to gray...");
+            color = Color.GRAY;
         }
     }
 
-    public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
+    public static void setDisabled(boolean disabled) {
+        Report localInstance = new Report();
+
+        localInstance.disabled = disabled;
     }
 }

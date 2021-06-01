@@ -1,8 +1,6 @@
 package io.github.jefflegendpower.discordreport.Commands;
 
 import io.github.jefflegendpower.discordreport.DiscordReport;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.TextChannel;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,46 +10,46 @@ import org.bukkit.plugin.PluginDescriptionFile;
 
 public class Reload implements CommandExecutor {
 
-    private final DiscordReport plugin;
-    private TextChannel textChannel;
-    private JDA bot;
-
-    public Reload(DiscordReport instance, JDA bot) {
-        plugin = instance;
-        this.bot = bot;
-    }
+    private final DiscordReport plugin = DiscordReport.getPlugin(DiscordReport.class);
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("reload-discordreport")) {
-            if (args.length > 0) {
-                sender.sendMessage(ChatColor.RED + "Too many arguments!");
-                return false;
-            }
+        if (cmd.getName().equalsIgnoreCase("discordreport")) {
+
             PluginDescriptionFile file = plugin.getDescription();
+
+            if (args.length < 1) {
+                sender.sendMessage(ChatColor.AQUA + "[DiscordReport] " + ChatColor.GRAY + " Correct syntax: discordreport reload");
+                return true;
+            }
+            if (!args[0].equalsIgnoreCase("reload")) {
+                sender.sendMessage(ChatColor.AQUA + "[DiscordReport] " + ChatColor.GRAY + " Correct syntax: discordreport reload");
+                return true;
+            }
 
             if (sender instanceof Player player) {
 
-                if (hasReload(player)) {
+                if (canReload(player)) {
 
                     reloadBot();
-                    sender.sendMessage(ChatColor.AQUA + file.getFullName() + ChatColor.GRAY + " reloaded files succesfully");
-                    System.out.println("[DiscordReport] " + (sender.getName() + " reloaded" + (file.getFullName())));
+                    sender.sendMessage(ChatColor.AQUA + "[DiscordReport] " + ChatColor.GRAY + " reloaded files succesfully");
+                    DiscordReport.log.info("[DiscordReport] " + (sender.getName() + " reloaded" + (file.getFullName())));
                 }
                 else {
-                    sender.sendMessage(ChatColor.RED + "You do not have access to that.");
+                    sender.sendMessage(ChatColor.AQUA + "[DiscordReport] " + ChatColor.RED + "You do not have access to that.");
                 }
             }
+
             else {
                 reloadBot();
-                DiscordReport.log.info("[pluginname] " + file.getName() + " was succesfully reloaded");
+                DiscordReport.log.info("[DiscordReport] successfully reloaded");
             }
             return true;
         }
         return false;
     }
 
-    private boolean hasReload(Player player) {
+    private boolean canReload(Player player) {
 
         if (player.hasPermission("discordreport.reload") || player.isOp()) {
             return true;
@@ -59,9 +57,9 @@ public class Reload implements CommandExecutor {
     }
 
     private void reloadBot() {
-
         plugin.reloadConfig();
         plugin.saveConfig();
-        plugin.updateBot();
+        Report.setDisabled(false);
+        plugin.buildJDA();
     }
 }
