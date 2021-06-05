@@ -4,8 +4,10 @@ import io.github.jefflegendpower.discordreport.DiscordReport;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.TextChannel;
+import okhttp3.internal.platform.Platform;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -54,7 +56,7 @@ public class Report implements CommandExecutor {
             }
 
             if (!(player.hasPermission("discordreport.report") || player.hasPermission("*") || player.isOp())) {
-                player.sendMessage(ChatColor.AQUA + "[DiscordReport]" + ChatColor.RED + "You do not have permission to execute that command");
+                player.sendMessage(ChatColor.AQUA + "[DiscordReport] " + ChatColor.RED + "You do not have permission to execute that command");
                 return true;
             }
 
@@ -116,7 +118,6 @@ public class Report implements CommandExecutor {
 
     public static void setDisabled(boolean disabled) {
         Report localInstance = new Report();
-
         localInstance.disabled = disabled;
     }
 }

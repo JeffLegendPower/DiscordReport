@@ -56,9 +56,9 @@ public final class DiscordReport extends JavaPlugin {
 
             bot = jdaBuilder.build();
             bot.awaitReady();
-            report.updateBot(bot);
+            if (report != null)
+                report.updateBot(bot);
         } catch (InterruptedException e) {
-            log.warning("");
             e.printStackTrace();
             Report.setDisabled(true);
         } catch (LoginException | NullPointerException e) {

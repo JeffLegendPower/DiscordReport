@@ -16,4 +16,3 @@ commands:
   reload-discordreport:
     description: reloads
     usage: /reload-discordreport
-
