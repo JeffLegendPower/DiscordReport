@@ -27,7 +27,9 @@ public class Reload implements CommandExecutor {
                 return true;
             }
 
-            if (sender instanceof Player player) {
+            if (sender instanceof Player) {
+
+                Player player = (Player) sender;
 
                 if (canReload(player)) {
 

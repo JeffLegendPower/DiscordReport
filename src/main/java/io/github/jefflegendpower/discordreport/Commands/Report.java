@@ -4,10 +4,8 @@ import io.github.jefflegendpower.discordreport.DiscordReport;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.TextChannel;
-import okhttp3.internal.platform.Platform;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -49,7 +47,8 @@ public class Report implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (command.getName().equalsIgnoreCase("report") && sender instanceof Player player) {
+        if (command.getName().equalsIgnoreCase("report") && sender instanceof Player) {
+            Player player = (Player) sender;
             if (disabled) {
                 sender.sendMessage(ChatColor.AQUA + "[DiscordReport] " + ChatColor.RED + "This command has been disabled due to an invalid config");
                 return true;
@@ -65,9 +64,9 @@ public class Report implements CommandExecutor {
             builder.setColor(color);
 
             switch (args.length) {
-                case 0 -> player.sendMessage(ChatColor.RED + "Who are you reporting?");
-                case 1 -> reportNoReason(builder, player, args[0]);
-                default -> reportWithReason(builder, player, args);
+                case 0: player.sendMessage(ChatColor.RED + "Who are you reporting?");
+                case 1: reportNoReason(builder, player, args[0]);
+                default: reportWithReason(builder, player, args);
             }
             return true;
         }
